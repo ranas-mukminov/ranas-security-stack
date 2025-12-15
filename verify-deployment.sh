@@ -11,7 +11,7 @@ echo ""
 USR=gha-rss
 UNIT="actions.runner.ranas-mukminov-ranas-security-stack.vpsrasil-ranas-security-stack-01.service"
 U_ID="$(id -u "$USR" 2>/dev/null || echo '')"
-NODEPORT=31235
+NODEPORT=30938
 EDGE_IP=10.252.1.1
 
 echo "Step 1: Configure rootless podman for gha-rss runner"

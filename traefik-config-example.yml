@@ -5,21 +5,19 @@
 
 http:
   routers:
-    rss:
-      rule: Host(`rss.run-as-daemon.ru`)
+    stack-router:
+      rule: Host(`stack.run-as-daemon.ru`)
       entryPoints:
-        - web
         - websecure
-      service: rss
-      # Uncomment if using cert resolver for HTTPS
-      # tls:
-      #   certResolver: letsencrypt
+      service: stack-k3s-service
+      tls:
+        certResolver: letsencrypt
 
   services:
-    rss:
+    stack-k3s-service:
       loadBalancer:
         servers:
-          - url: "http://10.252.1.2:31235"
+          - url: "http://10.252.1.2:30938"
         healthCheck:
           path: /health
           interval: 30s
