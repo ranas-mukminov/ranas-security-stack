@@ -19,7 +19,7 @@ http:
     rss:
       loadBalancer:
         servers:
-          - url: "http://10.252.1.2:31234"
+          - url: "http://10.252.1.2:31235"
         healthCheck:
           path: /health
           interval: 30s
