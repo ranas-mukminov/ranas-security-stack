@@ -1,0 +1,60 @@
+name: Build and Deploy to k3s
+
+on:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ranas-mukminov/ranas-security-stack
+
+jobs:
+    build-and-deploy:
+        runs-on: [self-hosted, gha-rss]
+        permissions:
+            contents: read
+            packages: write
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Build container image
+              run: |
+                  podman build \
+                    -f Containerfile \
+                    -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                    -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+                    .
+
+            - name: Login to GitHub Container Registry
+              run: |
+                  echo "${{ secrets.GITHUB_TOKEN }}" | \
+                    podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+
+            - name: Push container images
+              run: |
+                  podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+                  podman push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+            - name: Deploy to k3s
+              run: |
+                  kubectl apply -f k8s/
+
+            - name: Update deployment with new image
+              run: |
+                  kubectl set image deployment/ranas-security-stack \
+                    app=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                    -n ranas-security-stack
+
+            - name: Wait for rollout
+              run: |
+                  kubectl rollout status deployment/ranas-security-stack \
+                    -n ranas-security-stack \
+                    --timeout=5m
+
+            - name: Verify deployment
+              run: |
+                  kubectl get pods,svc -n ranas-security-stack -o wide

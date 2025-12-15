@@ -1,0 +1,26 @@
+# Traefik Configuration for ranas-security-stack
+
+# Add this to your Traefik dynamic configuration file (e.g., /etc/traefik/dynamic.yml)
+# on run-as-daemon server
+
+http:
+  routers:
+    rss:
+      rule: Host(`rss.run-as-daemon.ru`)
+      entryPoints:
+        - web
+        - websecure
+      service: rss
+      # Uncomment if using cert resolver for HTTPS
+      # tls:
+      #   certResolver: letsencrypt
+
+  services:
+    rss:
+      loadBalancer:
+        servers:
+          - url: "http://10.252.1.2:31234"
+        healthCheck:
+          path: /health
+          interval: 30s
+          timeout: 5s
