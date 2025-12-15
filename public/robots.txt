@@ -1,0 +1,30 @@
+# robots.txt for Ranas Security Stack
+# https://github.run-as-daemon.ru
+
+User-agent: *
+Allow: /
+
+# Allow AI crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+# Sitemap
+Sitemap: https://github.run-as-daemon.ru/sitemap.xml
+
+# LLM context
+# See /llms.txt for AI-friendly site description
