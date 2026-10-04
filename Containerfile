@@ -74,9 +74,15 @@ RUN chown -R nginx:nginx /usr/share/nginx/html && \
     touch /var/run/nginx.pid && \
     chown nginx:nginx /var/run/nginx.pid
 
+# wget for HEALTHCHECK (tiny; nginx alpine may lack curl)
+RUN apk add --no-cache wget
+
 # Switch to non-root user
 USER nginx
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:8080/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
