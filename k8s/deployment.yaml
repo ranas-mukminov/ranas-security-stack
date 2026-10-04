@@ -15,11 +15,14 @@ spec:
       labels:
         app: ranas-security-stack
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 101
         runAsGroup: 101
         fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: app
         image: ghcr.io/ranas-mukminov/ranas-security-stack:latest
@@ -27,6 +30,13 @@ spec:
         - name: http
           containerPort: 8080
           protocol: TCP
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
         livenessProbe:
           httpGet:
             path: /health
