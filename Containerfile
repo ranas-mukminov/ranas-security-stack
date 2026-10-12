@@ -46,16 +46,24 @@ server {
     }
 
     # Cache static assets
+    # NOTE: any add_header in a location clears inherited add_header from server{}.
+    # Re-declare security headers here so JS/CSS responses stay framed/nosniff-safe.
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
-        add_header Cache-Control "public, immutable";
+        add_header Cache-Control "public, immutable" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
     }
 
     # Health check endpoint
     location /health {
         access_log off;
+        add_header Content-Type text/plain always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
         return 200 "healthy\n";
-        add_header Content-Type text/plain;
     }
 }
 EOF
